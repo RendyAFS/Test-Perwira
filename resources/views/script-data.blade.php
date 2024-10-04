@@ -167,10 +167,11 @@
                         method: 'DELETE',
                         success: function(response) {
                             Swal.fire({
-                                title: 'Berhasil!',
-                                text: response.message,
                                 icon: 'success',
-                                confirmButtonText: 'OK'
+                                title: 'Product Created',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
                             });
                             // Reload DataTables setelah penghapusan
                             $('#productsTable').DataTable().ajax.reload();
