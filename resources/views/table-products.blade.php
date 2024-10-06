@@ -31,7 +31,12 @@
             columns: [{
                     data: 'created_at',
                     name: 'created_at',
-                    visible: false
+                    visible: false,
+                    className: "align-middle",
+                    render: function(data, type, full, meta) {
+                        const date = new Date(data);
+                        return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
+                    }
                 },
                 {
                     data: 'name',
@@ -58,7 +63,12 @@
                     name: 'image',
                     className: "align-middle",
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    render: function(data, type, full, meta) {
+                        return `<a href="/storage/${data}" target="_blank">
+                                <img class="rounded-4" src="/storage/${data}" alt="${full.name}" width="50" height="50">
+                            </a>`;
+                    }
                 },
                 {
                     data: 'description',
@@ -66,14 +76,22 @@
                     className: "align-middle"
                 },
                 {
-                    data: 'actions',
+                    data: null,
                     name: 'actions',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    render: function(data, type, full, meta) {
+                        return `<button class="edit-btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal" data-id="${full.id}">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </button>
+                            <button class="delete-btn btn btn-danger" data-id="${full.id}">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>`;
+                    }
                 }
             ],
             order: [
-                [0, 'asc']
+                [0, 'desc']
             ],
             responsive: true
         });

@@ -9,61 +9,20 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+
 
 class ProductController extends Controller
 {
 
-    public function index(Request $request)
+    public function index()
     {
-        $columns = ['name', 'code', 'price', 'stok', 'description', 'image', 'created_at'];
+        $query = Product::select(['id', 'name', 'code', 'price', 'stok', 'description', 'image', 'created_at']);
 
-        $query = Product::select('id', ...$columns);
-
-        // Pencarian
-        if ($request->has('search') && $request->search['value'] != '') {
-            $searchValue = $request->search['value'];
-            $query->where(function ($subQuery) use ($columns, $searchValue) {
-                foreach ($columns as $column) {
-                    $subQuery->orWhere($column, 'like', "%{$searchValue}%");
-                }
-            });
-        }
-
-        // Sorting
-        if ($request->order) {
-            foreach ($request->order as $order) {
-                $query->orderBy($columns[$order['column']], $order['dir']);
-            }
-        }
-
-        $totalData = $query->count();
-        $products = $query->skip($request->start)
-            ->take($request->length)
-            ->get();
-
-        // Format Data
-        $data = [];
-        foreach ($products as $product) {
-            $data[] = [
-                'created_at' => Carbon::parse($product->created_at)->format('d-m-Y H:i'),
-                'name' => $product->name,
-                'code' => $product->code,
-                'price' => $product->price,
-                'stok' => $product->stok,
-                'description' => $product->description,
-                'image' => '<a href="/storage/' . $product->image . '" target="_blank"><img class="rounded-4" src="/storage/' . $product->image . '" alt="' . $product->name . '" width="50" height="50"></a>',
-                'actions' => '<button class="edit-btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal" data-id="' . $product->id . '"><i class="bi bi-pencil-square"></i> Edit</button>
-                              <button class="delete-btn btn btn-danger" data-id="' . $product->id . '"><i class="bi bi-trash"></i> Delete</button>',
-            ];
-        }
-
-        return response()->json([
-            'draw' => intval($request->draw),
-            'recordsTotal' => $totalData,
-            'recordsFiltered' => $totalData,
-            'data' => $data,
-        ]);
+        return DataTables::of($query)
+            ->make(true);
     }
+
 
     public function store(Request $request)
     {
@@ -122,7 +81,6 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Product created successfully', 'product' => $product]);
     }
-
 
     public function show($id)
     {

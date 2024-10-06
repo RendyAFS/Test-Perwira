@@ -7,7 +7,6 @@
             }
         });
 
-
         // Create Product
         $('#createProductForm').on('submit', function(e) {
             e.preventDefault();
